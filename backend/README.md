@@ -5,6 +5,7 @@ Node.js/Express backend server for ScrapeSense Chrome extension. Handles AI-powe
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 
@@ -51,14 +52,17 @@ npm start
 ## API Endpoints
 
 ### Health Check
+
 - **GET** `/health` - Check server status
 
 ### Chat
+
 - **POST** `/api/chat` - Send a chat message
   - Body: `{ message, pageContent?, conversationHistory? }`
   - Response: `{ success, data: { id, type, content, timestamp } }`
 
 ### Page Analysis
+
 - **POST** `/api/analyze` - Analyze page content
   - Body: `{ pageContent, query? }`
   - Response: `{ success, data: { summary, keyPoints, entities, sentiment } }`

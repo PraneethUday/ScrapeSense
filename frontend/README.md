@@ -5,6 +5,7 @@ A React-based Chrome extension that provides AI-powered web scraping and chatbot
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 - Chrome browser (for extension testing)
@@ -79,21 +80,25 @@ frontend/
 ## Architecture
 
 ### Popup (`popup.html` → `popup-ui.tsx`)
+
 - Main entry point when user clicks the extension icon
 - Displays ChatPanel component in 450×600px popup
 - Loads styling from `style.css`
 
 ### Content Script (`content.ts`)
+
 - Minimal script that runs on every page
 - Extracts page content (title, text, metadata)
 - Responds to requests from popup/background
 
 ### Background Service Worker (`background.ts`)
+
 - Handles message routing between popup and content scripts
 - Stores page content temporarily
 - Manages extension state
 
 ### ChatPanel Component
+
 - React component with message history
 - Auto-scrolling conversation view
 - Input handling and AI response simulation
@@ -104,6 +109,7 @@ frontend/
 Uses CSS isolation with `all: initial !important` to prevent website CSS interference.
 
 Color scheme:
+
 - Header: Purple gradient (#667eea → #764ba2)
 - Body: Light gray/white
 - Messages: Blue (user), Gray (assistant)
@@ -133,14 +139,15 @@ Currently uses placeholder responses. To integrate with ScrapeSense backend:
 4. Process and display AI response
 
 Example:
+
 ```typescript
-const response = await fetch('http://localhost:3000/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ 
-    message: userInput, 
-    pageContent: pageData 
-  })
+const response = await fetch("http://localhost:3000/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    message: userInput,
+    pageContent: pageData,
+  }),
 });
 ```
 

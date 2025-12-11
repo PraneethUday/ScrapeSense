@@ -1,10 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 // Load environment variables
 dotenv.config();
@@ -18,27 +18,27 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(morgan("dev"));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
-    status: 'ok',
-    message: 'ScrapeSense backend is running',
+    status: "ok",
+    message: "ScrapeSense backend is running",
     timestamp: new Date().toISOString(),
   });
 });
 
 // API Routes
-app.post('/api/chat', async (req: Request, res: Response) => {
+app.post("/api/chat", async (req: Request, res: Response) => {
   try {
     const { message, pageContent, conversationHistory } = req.body;
 
     if (!message) {
       return res.status(400).json({
-        error: 'Message is required',
+        error: "Message is required",
       });
     }
 
@@ -46,7 +46,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     // In production, this will connect to OpenAI/Claude API
     const response = {
       id: `msg-${Date.now()}`,
-      type: 'assistant',
+      type: "assistant",
       content: `Echo: ${message}. [This is a placeholder response. Connect to your AI API for real answers.]`,
       timestamp: new Date().toISOString(),
       usage: {
@@ -60,31 +60,31 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       data: response,
     });
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error("Chat error:", error);
     res.status(500).json({
-      error: 'Failed to process chat message',
-      details: error instanceof Error ? error.message : 'Unknown error',
+      error: "Failed to process chat message",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
 
 // Page content analysis endpoint
-app.post('/api/analyze', async (req: Request, res: Response) => {
+app.post("/api/analyze", async (req: Request, res: Response) => {
   try {
     const { pageContent, query } = req.body;
 
     if (!pageContent) {
       return res.status(400).json({
-        error: 'Page content is required',
+        error: "Page content is required",
       });
     }
 
     // Placeholder for content analysis
     const analysis = {
-      summary: 'Page analysis placeholder',
-      keyPoints: ['Point 1', 'Point 2', 'Point 3'],
+      summary: "Page analysis placeholder",
+      keyPoints: ["Point 1", "Point 2", "Point 3"],
       entities: [],
-      sentiment: 'neutral',
+      sentiment: "neutral",
     };
 
     res.status(200).json({
@@ -92,10 +92,10 @@ app.post('/api/analyze', async (req: Request, res: Response) => {
       data: analysis,
     });
   } catch (error) {
-    console.error('Analysis error:', error);
+    console.error("Analysis error:", error);
     res.status(500).json({
-      error: 'Failed to analyze page content',
-      details: error instanceof Error ? error.message : 'Unknown error',
+      error: "Failed to analyze page content",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
@@ -103,7 +103,7 @@ app.post('/api/analyze', async (req: Request, res: Response) => {
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
-    error: 'Not found',
+    error: "Not found",
     path: req.path,
     method: req.method,
   });
@@ -111,10 +111,13 @@ app.use((req: Request, res: Response) => {
 
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Server error:', err);
+  console.error("Server error:", err);
   res.status(500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred',
+    error: "Internal server error",
+    message:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : "An error occurred",
   });
 });
 
