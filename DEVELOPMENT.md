@@ -67,17 +67,19 @@ ScrapeSense/
 ### Initial Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/ScrapeSense.git
    cd ScrapeSense
    ```
 
 2. **Install dependencies**
+
    ```bash
    # Frontend
    cd frontend
    npm install
-   
+
    # Backend (new terminal)
    cd backend
    npm install
@@ -106,6 +108,7 @@ npm run build
 ```
 
 Then load in Chrome:
+
 1. Go to `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked"
@@ -116,6 +119,7 @@ Then load in Chrome:
 Run both services for full functionality.
 
 **Terminal 1 - Backend Server:**
+
 ```bash
 cd backend
 npm run dev
@@ -123,6 +127,7 @@ npm run dev
 ```
 
 **Terminal 2 - Build Frontend:**
+
 ```bash
 cd frontend
 npm run build
@@ -147,17 +152,20 @@ Note: This is for component development. The extension popup must be loaded from
 ### Making Changes to the Extension
 
 1. **Edit files in `frontend/src/`**
+
    - Components in `src/components/`
    - Styles in `src/styles/`
    - Extension code in `src/extension/`
 
 2. **Build the extension**
+
    ```bash
    cd frontend
    npm run build
    ```
 
 3. **Reload in Chrome**
+
    - Go to `chrome://extensions/`
    - Find ScrapeSense
    - Click the reload icon
@@ -169,15 +177,18 @@ Note: This is for component development. The extension popup must be loaded from
 ### Making Changes to the Backend
 
 1. **Edit files in `backend/src/`**
+
    - Main server: `src/server.ts`
    - API routes: `src/routes/` (create as needed)
    - Services: `src/services/` (create as needed)
 
 2. **Development server with auto-reload**
+
    ```bash
    cd backend
    npm run dev
    ```
+
    Changes automatically reload the server.
 
 3. **Build for production**
@@ -198,19 +209,16 @@ Note: This is for component development. The extension popup must be loaded from
 - Follow ESLint rules
 
 Example component:
+
 ```typescript
 // src/components/MyComponent.tsx
-import React, { useState } from 'react';
-import './MyComponent.css';
+import React, { useState } from "react";
+import "./MyComponent.css";
 
 export const MyComponent: React.FC = () => {
-  const [state, setState] = useState('initial');
-  
-  return (
-    <div className="my-component">
-      {state}
-    </div>
-  );
+  const [state, setState] = useState("initial");
+
+  return <div className="my-component">{state}</div>;
 };
 ```
 
@@ -223,15 +231,16 @@ export const MyComponent: React.FC = () => {
 - Follow HTTP best practices
 
 Example endpoint:
+
 ```typescript
 // Backend endpoint
-app.post('/api/chat', async (req: Request, res: Response) => {
+app.post("/api/chat", async (req: Request, res: Response) => {
   try {
     const { message } = req.body;
     // Process request
     res.status(200).json({ success: true, data: response });
   } catch (error) {
-    res.status(500).json({ error: 'Message' });
+    res.status(500).json({ error: "Message" });
   }
 });
 ```
@@ -246,6 +255,7 @@ npm run build
 ```
 
 **What it does:**
+
 1. Runs TypeScript compiler (`tsc -b`)
 2. Bundles with Vite
 3. Creates multiple entry points:
@@ -258,6 +268,7 @@ npm run build
 6. Output: `frontend/dist/`
 
 **Output files:**
+
 ```
 dist/
 ├── popup-ui.js          # Popup initialization
@@ -280,10 +291,12 @@ npm run build
 ```
 
 **What it does:**
+
 1. Runs TypeScript compiler
 2. Outputs JavaScript to `dist/`
 
 **To run compiled version:**
+
 ```bash
 npm start
 ```
@@ -310,15 +323,18 @@ npm test        # Run tests (vitest)
 ### Frontend (Extension)
 
 1. **View extension logs:**
+
    - Right-click extension icon → "Inspect popup"
    - View console in DevTools
 
 2. **Inspect popup:**
+
    - Click extension icon
    - Right-click → "Inspect"
    - Inspect HTML/CSS/JS
 
 3. **View service worker:**
+
    - Go to `chrome://extensions/`
    - Find ScrapeSense
    - Click "Service worker" link
@@ -331,16 +347,18 @@ npm test        # Run tests (vitest)
 ### Backend (Server)
 
 1. **View logs:**
+
    ```bash
    npm run dev
    # Logs printed to console
    ```
 
 2. **Test endpoints:**
+
    ```bash
    # Health check
    curl http://localhost:3000/health
-   
+
    # Chat endpoint
    curl -X POST http://localhost:3000/api/chat \
      -H "Content-Type: application/json" \
@@ -354,6 +372,7 @@ npm test        # Run tests (vitest)
 **Error:** "Manifest is not valid"
 
 **Solution:**
+
 1. Check `public/manifest.json` syntax
 2. Rebuild: `npm run build`
 3. Reload extension in Chrome
@@ -363,6 +382,7 @@ npm test        # Run tests (vitest)
 **Problem:** Extension icon shows but popup is empty
 
 **Solution:**
+
 1. Rebuild: `npm run build`
 2. Hard reload in Chrome: `Ctrl+Shift+R`
 3. Check console: Right-click extension → "Inspect popup"
@@ -372,6 +392,7 @@ npm test        # Run tests (vitest)
 **Problem:** Extension can't reach backend server
 
 **Solution:**
+
 1. Verify backend is running: `npm run dev`
 2. Check port is 3000
 3. Verify CORS settings in `backend/src/server.ts`
@@ -382,6 +403,7 @@ npm test        # Run tests (vitest)
 **Problem:** TypeScript compilation fails
 
 **Solution:**
+
 1. Check file exists
 2. Verify imports are correct
 3. Rebuild: `npm run build`
@@ -390,12 +412,14 @@ npm test        # Run tests (vitest)
 ## Performance Optimization
 
 ### Frontend
+
 - Bundle analyzed in `dist/`
 - Main bundle: ~562KB (101KB gzipped)
 - CSS: 9.12KB (1.79KB gzipped)
 - Minification disabled for debugging
 
 ### Backend
+
 - Use request compression
 - Implement caching
 - Optimize database queries (future)
@@ -414,6 +438,7 @@ npm test        # Run tests (vitest)
 ### Backend (Hosting)
 
 Options:
+
 - Heroku
 - AWS EC2/Lambda
 - DigitalOcean
@@ -421,6 +446,7 @@ Options:
 - Vercel (Node.js support)
 
 Build and deploy:
+
 ```bash
 cd backend
 npm run build

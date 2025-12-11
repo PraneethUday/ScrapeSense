@@ -62,22 +62,22 @@ ScrapeSense/
 
 ### Frontend
 
-| Command | Purpose |
-|---------|---------|
-| `npm run dev` | Dev server with hot reload |
-| `npm run build` | Build extension for Chrome |
-| `npm run lint` | Check code quality |
-| `npm run preview` | Preview build |
+| Command           | Purpose                    |
+| ----------------- | -------------------------- |
+| `npm run dev`     | Dev server with hot reload |
+| `npm run build`   | Build extension for Chrome |
+| `npm run lint`    | Check code quality         |
+| `npm run preview` | Preview build              |
 
 ### Backend
 
-| Command | Purpose |
-|---------|---------|
-| `npm run dev` | Dev server with auto-reload |
-| `npm run build` | Compile TypeScript |
-| `npm start` | Run production build |
-| `npm run lint` | Check code quality |
-| `npm test` | Run tests |
+| Command         | Purpose                     |
+| --------------- | --------------------------- |
+| `npm run dev`   | Dev server with auto-reload |
+| `npm run build` | Compile TypeScript          |
+| `npm start`     | Run production build        |
+| `npm run lint`  | Check code quality          |
+| `npm test`      | Run tests                   |
 
 ---
 
@@ -85,11 +85,11 @@ ScrapeSense/
 
 **Base URL:** `http://localhost:3000`
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/health` | Server status |
-| POST | `/api/chat` | Send message |
-| POST | `/api/analyze` | Analyze content |
+| Method | Endpoint       | Purpose         |
+| ------ | -------------- | --------------- |
+| GET    | `/health`      | Server status   |
+| POST   | `/api/chat`    | Send message    |
+| POST   | `/api/analyze` | Analyze content |
 
 ### Example Requests
 
@@ -108,6 +108,7 @@ curl -X POST http://localhost:3000/api/chat \
 ## 🎯 Key Files
 
 ### Frontend
+
 - **`frontend/src/components/ChatPanel.tsx`** - Main chat interface
 - **`frontend/src/extension/popup-ui.tsx`** - Popup initialization
 - **`frontend/public/manifest.json`** - Extension configuration
@@ -115,6 +116,7 @@ curl -X POST http://localhost:3000/api/chat \
 - **`frontend/vite.config.ts`** - Build configuration
 
 ### Backend
+
 - **`backend/src/server.ts`** - Main API server
 - **`backend/.env.example`** - Environment template
 - **`backend/package.json`** - Dependencies & scripts
@@ -135,6 +137,7 @@ npm run dev
 ### With AI Integration (Future)
 
 Add to `backend/.env`:
+
 ```
 OPENAI_API_KEY=sk-...
 # or
@@ -146,12 +149,14 @@ ANTHROPIC_API_KEY=sk-...
 ## 🐛 Troubleshooting
 
 ### Extension won't load
+
 ```bash
 cd frontend && npm run build
 # Reload in chrome://extensions/
 ```
 
 ### Backend not starting
+
 ```bash
 cd backend
 npm install
@@ -160,6 +165,7 @@ npm run dev
 ```
 
 ### Port 3000 already in use
+
 ```bash
 # Change PORT in backend/.env
 PORT=3001
@@ -193,7 +199,7 @@ PORT=3001
 ### Example: Add API Endpoint
 
 1. **Create endpoint** in `backend/src/server.ts`
-2. **Test it:** 
+2. **Test it:**
    ```bash
    curl http://localhost:3000/api/your-endpoint
    ```
