@@ -37,6 +37,7 @@ chrome.runtime.onMessage.addListener(
       } catch (error) {
         sendResponse({ status: "error", message: String(error) });
       }
+      return true; // Required for async response
     }
-  }
+  },
 );

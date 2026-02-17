@@ -33,6 +33,7 @@ export const ChatPanel: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,24 +56,56 @@ export const ChatPanel: React.FC = () => {
     extractPageContent();
   }, []);
 
-  const extractPageContent = () => {
-    // Get page content from the content script
-    window.postMessage(
-      {
-        type: "SCRAPESENSE_GET_CONTENT",
-      },
-      "*"
-    );
+  const extractPageContent = async () => {
+    try {
+      // Get the active tab
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
 
-    // Listen for content response
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === "SCRAPESENSE_PAGE_CONTENT") {
-        setPageContent(event.data.content);
-        window.removeEventListener("message", handleMessage);
+      if (!tab.id) {
+        console.error("No active tab found");
+        return;
       }
-    };
 
-    window.addEventListener("message", handleMessage);
+      // Inject content script if not already injected
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content.js"],
+        });
+      } catch (error) {
+        // Content script might already be injected, which is fine
+        console.log("Content script injection:", error);
+      }
+
+      // Send message to content script to get page content
+      chrome.tabs.sendMessage(
+        tab.id,
+        { type: "GET_PAGE_CONTENT" },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(
+              "Error getting page content:",
+              chrome.runtime.lastError,
+            );
+            setContentLoaded(false);
+            return;
+          }
+
+          if (response && response.status === "success") {
+            setPageContent(response.content);
+            setContentLoaded(true);
+            console.log("Page content received:", response.content);
+          } else {
+            setContentLoaded(false);
+          }
+        },
+      );
+    } catch (error) {
+      console.error("Error extracting page content:", error);
+    }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -95,22 +128,34 @@ export const ChatPanel: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare context for AI
-      const context = pageContent
-        ? `Current page: ${pageContent.title}\nURL: ${
-            pageContent.url
-          }\nPage content: ${pageContent.text.substring(0, 5000)}`
-        : "No page content available";
+      // Call backend API
+      const response = await fetch("http://localhost:3000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          pageContent: pageContent,
+          conversationHistory: messages.filter((msg) => msg.id !== "1"), // Exclude welcome message
+        }),
+      });
 
-      // TODO: Connect to AI agent (ChatGPT, Claude, etc.)
-      // For now, we'll simulate a response
-      const response = await simulateAIResponse(userMessage.content, context);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to get response");
+      }
 
       const assistantMessage: Message = {
-        id: Date.now().toString(),
+        id: data.data.id,
         type: "assistant",
-        content: response,
-        timestamp: new Date(),
+        content: data.data.content,
+        timestamp: new Date(data.data.timestamp),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -119,39 +164,14 @@ export const ChatPanel: React.FC = () => {
       const errorMessage: Message = {
         id: Date.now().toString(),
         type: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
+        content:
+          "Sorry, I encountered an error connecting to the AI service. Please make sure the backend is running on http://localhost:3000",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Simulate AI response (remove this once connected to real AI)
-  const simulateAIResponse = (
-    query: string,
-    context: string
-  ): Promise<string> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (query.toLowerCase().includes("summary")) {
-          resolve(
-            "Here's a summary of the page content... [This is a placeholder response. Connect to your AI agent to get real responses.]"
-          );
-        } else if (query.toLowerCase().includes("help")) {
-          resolve(
-            "I can help you by:\n- Summarizing page content\n- Answering questions about what's on the page\n- Extracting specific information\n- Explaining complex topics\n\nWhat would you like to know about this page?"
-          );
-        } else {
-          resolve(
-            `Based on the current page "${
-              context.split("\n")[0]
-            }", here's my response to your question:\n\n[This is a placeholder. Connect to your AI agent for real answers.]`
-          );
-        }
-      }, 800);
-    });
   };
 
   const handleClearChat = () => {
@@ -184,6 +204,34 @@ export const ChatPanel: React.FC = () => {
           🗑️
         </button>
       </div>
+
+      {/* Page Content Status */}
+      {contentLoaded && pageContent && (
+        <div
+          style={{
+            padding: "8px 16px",
+            fontSize: "12px",
+            background: "#e8f5e9",
+            color: "#2e7d32",
+            borderBottom: "1px solid #ddd",
+          }}
+        >
+          ✓ Analyzing: {pageContent.title || pageContent.url}
+        </div>
+      )}
+      {!contentLoaded && (
+        <div
+          style={{
+            padding: "8px 16px",
+            fontSize: "12px",
+            background: "#fff3e0",
+            color: "#e65100",
+            borderBottom: "1px solid #ddd",
+          }}
+        >
+          ⚠ Loading page content...
+        </div>
+      )}
 
       {/* Messages Container */}
       <div className="messages-container">

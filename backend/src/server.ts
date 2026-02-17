@@ -5,12 +5,17 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Load environment variables
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Initialize Google Gemini client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-pro" });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,12 +47,48 @@ app.post("/api/chat", async (req: Request, res: Response) => {
       });
     }
 
-    // Placeholder for AI integration
-    // In production, this will connect to OpenAI/Claude API
+    // Build conversation context with page content
+    const systemContext = pageContent
+      ? `You are ScrapeSense, an AI assistant that helps users understand and analyze web page content. 
+        
+Current page information:
+Title: ${pageContent.title || "Unknown"}
+URL: ${pageContent.url || "Unknown"}
+Page content: ${pageContent.text?.substring(0, 8000) || "No content available"}
+
+Help the user by answering questions about this page, summarizing content, extracting information, or explaining concepts found on the page.`
+      : "You are ScrapeSense, an AI assistant that helps users understand web content. The current page content is not available.";
+
+    // Build conversation history for Gemini
+    const chatHistory = (conversationHistory || []).map((msg: any) => ({
+      role: msg.type === "user" ? "user" : "model",
+      parts: [{ text: msg.content }],
+    }));
+
+    // Create chat session with history
+    const chat = model.startChat({
+      history: chatHistory,
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      },
+    });
+
+    // Construct the full prompt with context
+    const fullPrompt = chatHistory.length === 0 
+      ? `${systemContext}\n\nUser: ${message}`
+      : message;
+
+    // Call Gemini API
+    const result = await chat.sendMessage(fullPrompt);
+    const response_text = result.response.text();
+
+    const aiResponse = response_text || "I'm sorry, I couldn't generate a response.";
+
     const response = {
       id: `msg-${Date.now()}`,
       type: "assistant",
-      content: `Echo: ${message}. [This is a placeholder response. Connect to your AI API for real answers.]`,
+      content: aiResponse,
       timestamp: new Date().toISOString(),
       usage: {
         promptTokens: 0,
